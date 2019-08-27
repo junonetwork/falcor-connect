@@ -1,0 +1,30 @@
+{
+  "name": "falcor-connect",
+  "version": "0.0.1",
+  "description": "react-falcor bindings",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint src/**/*.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Conkling <james.lane.conkling@gmail.com> jameslaneconkling.github.io",
+  "license": "ISC",
+  "dependencies": {
+    "recompose": "^0.30.0",
+    "rxjs": "^6.5.2"
+  },
+  "peerDependencies": {
+    "falcor": "^2.1.0",
+    "falcor-http-datasource": "^0.1.3",
+    "react": "^0.14.0 || ^15.0.0 || ^16.0.0"
+  },
+  "devDependencies": {
+    "@types/falcor": "^2.0.0",
+    "@types/recompose": "^0.30.7",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.2.2",
+    "typescript": "^3.5.3"
+  }
+}
