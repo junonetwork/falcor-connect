@@ -10,14 +10,11 @@
   },
   "author": "James Conkling <james.lane.conkling@gmail.com> jameslaneconkling.github.io",
   "license": "ISC",
-  "dependencies": {
-    "recompose": "^0.30.0",
-    "rxjs": "^6.5.2"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "falcor": "^2.1.0",
-    "falcor-http-datasource": "^0.1.3",
-    "react": "^0.14.0 || ^15.0.0 || ^16.0.0"
+    "react": "^16.8.0",
+    "rxjs": "^6.5.0"
   },
   "devDependencies": {
     "@types/falcor": "^2.0.0",
@@ -25,6 +22,7 @@
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.2.2",
+    "recompose": "^0.30.0",
     "typescript": "^3.5.3"
   }
 }

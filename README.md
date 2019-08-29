@@ -1,3 +1,12 @@
+# Falcor Connect
+
+React-Falcor bindings and a Higher Order Component
+
+## Usage
+
+See `/examples`.
+
+```js
 import { createElement } from 'react';
 import { Model } from 'falcor'
 import { createEventHandler, compose, withProps } from 'recompose'
@@ -46,3 +55,4 @@ export const TodoList = compose(
     )
   }
 )
+```
