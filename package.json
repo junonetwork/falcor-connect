@@ -10,7 +10,9 @@
   },
   "author": "James Conkling <james.lane.conkling@gmail.com> jameslaneconkling.github.io",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "ramda": "^0.26.1"
+  },
   "peerDependencies": {
     "falcor": "^2.1.0",
     "react": "^16.8.0",
@@ -18,6 +20,7 @@
   },
   "devDependencies": {
     "@types/falcor": "^2.0.0",
+    "@types/ramda": "^0.26.21",
     "@types/recompose": "^0.30.7",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",

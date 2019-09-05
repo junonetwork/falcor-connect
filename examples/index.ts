@@ -2,7 +2,8 @@ import { createElement } from 'react';
 import { Model } from 'falcor'
 import { createEventHandler, compose, withProps } from 'recompose'
 import { Observable } from 'rxjs'
-import { ChildProps, FalcorList, WithFalcor } from '../src'
+import { ChildProps, FalcorList, WithFalcor, TerminalSentinel, map } from '../src'
+import { pathOr } from 'ramda';
 
 
 const {
@@ -21,8 +22,10 @@ const model = new Model({
 
 const withFalcor = WithFalcor(model, graphChange$)
 
+type Todo = { label: TerminalSentinel<string>, status: TerminalSentinel<'pending' | 'complete'> }
+
 type Fragment = {
-  todos: FalcorList<{ label: string, status: 'pending' | 'complete' }>
+  todos: FalcorList<Todo>
 }
 
 export const TodoList = compose(
@@ -31,18 +34,21 @@ export const TodoList = compose(
     ['todos', { from: page, to: page + 10 }, ['label', 'status']],
     ['todos', 'length']
   ]),
-  ({ page, graph: { todos }}: ChildProps<{ page: number }, Fragment>) => {
+  ({ page, graphFragment }: { page: number } & ChildProps<Fragment>) => {
+    const length = pathOr<TerminalSentinel<number>>({ $type: 'error', value: 'Error' }, ['json', 'todos', 'length'], graphFragment)
+
     return createElement('div', {},
       createElement('ul', {},
-        Object.keys(todos)
-          .filter((key) => key !== 'length')
-          .map((key) => (
+        map(({ label, status }, idx) => (
+          label.$type === 'atom' && status.$type === 'atom' ?
             createElement('li', {
-              className: todos[key].status,
-              key: todos[key].label
-            }, todos[key].label)
-          ))),
-      createElement('p', {}, `Showing ${page * 10} to ${page * 10 + 10} of ${todos.length}`)
+              className: status.value,
+              key: label.value,
+            }, label.value) :
+            createElement('li', { key: idx }, 'Error')
+        ),
+        pathOr<FalcorList<Todo>>({} as FalcorList, ['json', 'todos'], graphFragment))),
+      length.$type === 'atom' ? createElement('p', {}, `Showing ${page * 10} to ${page * 10 + 10} of ${length.value}`) : null
     )
   }
 )
