@@ -2,7 +2,7 @@ import { of, merge, from, empty, Observable, Subscribable, Subject, Subscription
 import { switchMap, startWith, map as mapRx, catchError, repeatWhen, auditTime, last } from 'rxjs/operators'
 import { PathSet, Model, JSONEnvelope, Path } from 'falcor'
 import { ComponentType, useState, useRef, useEffect, createElement, Component, useMemo } from 'react'
-import { equals, propEq } from 'ramda';
+import { equals, propEq } from 'ramda'
 
 
 export type Options<Props> = {
