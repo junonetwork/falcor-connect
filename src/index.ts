@@ -208,7 +208,7 @@ export const ComposeFalcor = (model: Model, graphChange$: Observable<undefined>)
       ...restFn.map((fn) => connectedModel<Props, Fragment>((props: Props & ChildProps<Fragment>) => {
         if (props.status === 'error') {
           return props.error instanceof Error ? props.error : new Error(props.error)
-        } else if (props.status === 'next' || Object.keys(props.graphFragment).length === 0) {
+        } else if (props.status === 'next') {
           return null
         }
         
