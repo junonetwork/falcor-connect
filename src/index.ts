@@ -95,16 +95,18 @@ const defaultErrorHandler = <Props>(error: Error, props: Props): Observable<Erro
 
 
 export const connect = (model: Model, graphChange$: Observable<undefined>) => <Props, Fragment extends Partial<TypedFragment> = Partial<TypedFragment>>(
-  paths: PathSet[] | ((props: Props) => PathSet[] | Error),
+  paths: PathSet[] | ((props: Props) => PathSet[] | Error | null),
   { errorHandler = defaultErrorHandler }: Options<Props> = {}
 ) => (props$: Observable<Props>): Observable<Props & ChildProps<Fragment>> => (
     props$.pipe(
       switchMap((props) => {
-        const _paths: PathSet[] | Error = typeof paths === 'function' ? paths(props) : paths
+        const _paths: PathSet[] | Error | null = typeof paths === 'function' ? paths(props) : paths
   
         if (_paths instanceof Error) {
           return of({ ...props, graphFragment: {}, status: 'error' as 'error', error: _paths })
-        } else if (_paths === null || _paths.length === 0) {
+        } else if (_paths === null) {
+          return of({ ...props, graphFragment: {}, status: 'next' as 'next' })
+        } else if (_paths.length === 0) {
           return of({ ...props, graphFragment: {}, status: 'complete' as 'complete' })
         }
   
@@ -205,9 +207,9 @@ export const ComposeFalcor = (model: Model, graphChange$: Observable<undefined>)
       connectedModel<Props, Fragment>(fn1),
       ...restFn.map((fn) => connectedModel<Props, Fragment>((props: Props & ChildProps<Fragment>) => {
         if (props.status === 'error') {
-          return props.error
+          return props.error instanceof Error ? props.error : new Error(props.error)
         } else if (props.status === 'next' || Object.keys(props.graphFragment).length === 0) {
-          return []
+          return null
         }
         
         return fn(props as Props & { status: 'complete', graphFragment: JSONEnvelope<Fragment> })

@@ -14,7 +14,7 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
-    "@typescript-eslint/member-delimiter-style": ["error", {
+    "@typescript-eslint/member-delimiter-style": ["warning", {
         "multiline": { "delimiter": "none" },
         "singleline": { "delimiter": "comma" }
     }],
