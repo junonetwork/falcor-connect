@@ -1,7 +1,8 @@
 import { createElement as el } from 'react'
 import { render } from 'react-dom'
 import { Route, BrowserRouter, Link } from 'react-router-dom'
-import { TodoList } from './todoList'
+import { TodoList } from './hoc'
+import { Widget } from './hook'
 
 render((
   el(BrowserRouter, {},
@@ -10,6 +11,7 @@ render((
       el('nav', null,
         el('ul', null,
           el('li', null, el(Link, { to: '/hoc' }, 'withFalcor HOC')),
-          el('li', null, el(Link, { to: '/abc' }, 'useFalcor Hook'))))),
-    el(Route, { path: '/hoc', component: TodoList }))
+          el('li', null, el(Link, { to: '/hook' }, 'useFalcor Hook'))))),
+    el(Route, { path: '/hoc', component: TodoList }),
+    el(Route, { path: '/hook', component: Widget }))
 ), document.getElementById('app'))

@@ -67,7 +67,7 @@ export const connect = (
 ) => (props$: Observable<Props>) => {
   const projectNext = ({ json: graphFragment }: JSONEnvelope<Fragment>): ChildProps<Fragment> => ({ status: 'next', graphFragment })
   const projectComplete = ({ graphFragment }: ChildProps<Fragment>): ChildProps<Fragment> => ({ status: 'complete', graphFragment })
-  const defaultComplete = { graphFragment: {}, status: 'complete' }
+  const defaultComplete: CompleteProps = { graphFragment: {}, status: 'complete' }
   const graphChangeHandler = () => graphChange$
 
   return zip(

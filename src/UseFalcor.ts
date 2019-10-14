@@ -12,21 +12,30 @@ export const useStream = <T, R>(
   const stream$ = useRef(new Subject<T>())
   const emit = useRef<{ next?: R, error?: any, complete: boolean }>({ complete: false })
   let synchronous = useRef(true)
-  let [_, rerender] = useState()
+  let [_, rerender] = useState(false)
 
   useLayoutEffect(() => {
-    const subscription = stream$.current.pipe(project).subscribe({
+    const subscription = stream$.current.pipe(
+      distinctUntilChanged(),
+      project
+    ).subscribe({
       next: (next) => {
         emit.current.next = next
-        if (!synchronous.current) rerender(emit.current)
+        if (!synchronous.current) {
+          rerender((prev) => !prev)
+        }
       },
       error: (error) => {
         emit.current.error = error
-        if (!synchronous.current) rerender(emit.current)
+        if (!synchronous.current) {
+          rerender((prev) => !prev)
+        }
       },
       complete: () => {
         emit.current.complete = true
-        if (!synchronous.current) rerender(emit.current) // if next and complete emit synchronously, this will cause rerender to be called twice
+        if (!synchronous.current) {
+          rerender((prev) => !prev) // if next and complete emit synchronously, this will cause rerender to be called twice
+        }
       }
     })
 

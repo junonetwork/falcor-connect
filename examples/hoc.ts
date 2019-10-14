@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 import { compose, withProps } from 'recompose'
-import { ChildProps, FalcorList, TerminalSentinel, map } from '../src'
-import { pathOr } from 'ramda';
-import { withFalcor } from './model';
+import { pathOr } from 'ramda'
+import { model, graphChange$ } from './model'
+import { ChildProps, FalcorList, TerminalSentinel, map, WithFalcor } from '../src'
 
 
 type Todo = { label: TerminalSentinel<string>, status: TerminalSentinel<'pending' | 'complete'> }
@@ -10,6 +10,10 @@ type Todo = { label: TerminalSentinel<string>, status: TerminalSentinel<'pending
 type Fragment = {
   todos: FalcorList<Todo>
 }
+
+
+const withFalcor = WithFalcor(model, graphChange$)
+
 
 export const TodoList = compose<{ page: number } & ChildProps<Fragment>, {}>(
   withProps({ page: 0 }),

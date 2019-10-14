@@ -1,16 +1,15 @@
 import { Model } from 'falcor'
 import { createEventHandler } from 'recompose'
 import { Observable } from 'rxjs'
-import { WithFalcor } from '../src'
 import { range } from 'ramda'
 
 
-const {
+export const {
   stream: graphChange$,
   handler: graphChange,
 } = createEventHandler<undefined, Observable<undefined>>()
 
-const model = new Model({
+export const model = new Model({
   cache: {
     todos: range(0, 5).reduce<{ [key: number]: { label: string, status: string } } & { length: number }>((graph, idx) => {
       graph[idx] = {
@@ -25,6 +24,3 @@ const model = new Model({
   .batch()
   .boxValues()
   .treatErrorsAsValues()
-
-
-export const withFalcor = WithFalcor(model, graphChange$)
