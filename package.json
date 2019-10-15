@@ -7,7 +7,7 @@
     "lint": "eslint src/**/*.ts",
     "dev": "webpack-dev-server --mode development --config ./examples/webpack.js --progress",
     "build:examples": "webpack --mode production --config ./examples/webpack.js --progress",
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc ./src/index.ts --outDir ./dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "James Conkling <james.lane.conkling@gmail.com> jameslaneconkling.github.io",
