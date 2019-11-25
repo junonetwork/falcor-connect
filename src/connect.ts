@@ -44,7 +44,7 @@ export const connect = <Fragment extends Partial<TypedFragment> = Partial<TypedF
         return of([prevProps, prevPaths])
       }
 
-      return from(model.get(...paths).progressively() as any as Subscribable<JSONEnvelope<Fragment>>).pipe(
+      return from(model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Fragment>>).pipe(
         mapSynchronous(projectNext, projectComplete, defaultNext, defaultComplete),
         catchError(errorHandler),
         repeatWhen(graphChangeHandler),

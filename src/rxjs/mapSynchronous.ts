@@ -1,4 +1,4 @@
-import { Observable, zip, from, Subscribable, of } from 'rxjs'
+import { Observable } from 'rxjs'
 
 
 /**
@@ -59,7 +59,9 @@ export const mapSynchronous = <T, R>(
       observer.next(projectNext(data))
     } else {
       // no synchronous emit
-      if (defaultSynchronousNext !== undefined) observer.next(defaultSynchronousNext)
+      if (defaultSynchronousNext !== undefined) {
+        observer.next(defaultSynchronousNext)
+      }
     }
 
     return subscription
