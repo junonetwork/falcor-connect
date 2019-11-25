@@ -14,15 +14,12 @@ export type Sentinel = Atom | Ref | ErrorSentinel
 export type Primitive = string | number | boolean | null | undefined
 export type ComplexType = Primitive
   | Primitive[]
-  // TODO - handle deep complex types once typescript can circularly reference types https://github.com/microsoft/TypeScript/pull/33050
-  | { [key: string]: Primitive | Primitive[] }
-  | { [key: string]: { [key: string]: Primitive | Primitive[] } }
-  | { [key: string]: { [key: string]: { [key: string]: Primitive | Primitive[] } } }
-  | { [key: string]: { [key: string]: { [key: string]: { [key: string]: Primitive | Primitive[] } } } }
+  | { [key: string]: Primitive }
+  | { [key: string]: Primitive[] }
 
 
 export type FalcorList<Item = any> = { length: Atom<number> | ErrorSentinel } & { [index: string]: Item }
 
 export type TerminalSentinel<T> = Atom<T> | Atom<null> | Atom<undefined> | ErrorSentinel<string | { message: string }>
 
-export type TypedFragment = TerminalSentinel<ComplexType> | { [key: string]: TypedFragment }
+export type TypedFragment = { [key: string]: TerminalSentinel<any> | TypedFragment }

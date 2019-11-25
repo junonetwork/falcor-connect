@@ -7,11 +7,11 @@ import { connect, Options } from './connect'
 
 
 export const WithFalcor = <Props, Fragment extends Partial<TypedFragment> = Partial<TypedFragment>>(model: Model, graphChange$: Observable<undefined>, options: Options = {}) => {
-  const connectedModel = connect<Fragment>(model, graphChange$, options)
+  const connectedModel = connect(model, graphChange$, options)
 
   return (
     paths: PathSet[] | Error | null | ((props: Props) => PathSet[] | Error | null),
-  ) => mapPropsStream<ChildProps & Props, Props>((props$) => combineLatest(
+  ) => mapPropsStream<ChildProps<Partial<Fragment>> & Props, Props>((props$) => combineLatest(
     props$,
     props$.pipe(
       map((props) => typeof paths === 'function' ? paths(props) : paths),

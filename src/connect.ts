@@ -1,9 +1,8 @@
 import { Observable, of, from, Subscribable } from 'rxjs'
 import { PathSet, Model, JSONEnvelope } from 'falcor'
 import { TypedFragment, ErrorProps, NextProps, CompleteProps, ChildProps } from './types'
-import { catchError, repeatWhen, map, switchMap } from 'rxjs/operators'
+import { catchError, repeatWhen, switchMap } from 'rxjs/operators'
 import { mapSynchronous } from './rxjs/mapSynchronous'
-import { equals as deepEquals } from 'ramda'
 
 
 export type Options = {
@@ -57,34 +56,34 @@ const defaultErrorHandler = (error: Error) => {
 //   )
 // }
 
-export const connect = <Fragment extends Partial<TypedFragment> = Partial<TypedFragment>>(
+export const connect = (
   model: Model,
   graphChange$: Observable<undefined>,
   { errorHandler = defaultErrorHandler }: Options = {}
 ) => {
-  const projectNext = ({ json: graphFragment }: JSONEnvelope<Fragment>): ChildProps<Fragment> => ({ status: 'next', graphFragment })
-  const projectComplete = ({ json: graphFragment }: JSONEnvelope<Fragment>): ChildProps<Fragment> => ({ status: 'complete', graphFragment })
-  const defaultNext: NextProps<Fragment> = ({ graphFragment: {}, status: 'next' })
+  const projectNext = <Fragment>({ json: graphFragment }: JSONEnvelope<Fragment>): NextProps<Fragment> => ({ status: 'next', graphFragment })
+  const projectComplete = <Fragment>({ json: graphFragment }: JSONEnvelope<Fragment>): CompleteProps<Fragment> => ({ status: 'complete', graphFragment })
+  const defaultNext: NextProps = ({ graphFragment: {}, status: 'next' })
   const defaultComplete: CompleteProps = { graphFragment: {}, status: 'complete' }
   const graphChangeHandler = () => graphChange$
 
-  return (pathSets$: Observable<PathSet[] | Error | null>): Observable<ChildProps<Fragment>> => pathSets$.pipe(
+  return <Fragment extends TypedFragment = TypedFragment>(
+    pathSets$: Observable<PathSet[] | Error | null>
+  ): Observable<ChildProps<Partial<Fragment>>> => pathSets$.pipe(
     switchMap((paths) => {
       if (paths instanceof Error) {
-        return of([{ graphFragment: {}, status: 'error', error: paths }, paths])
+        return of({ graphFragment: {}, status: 'error', error: paths })
       } else if (paths === null) {
-        return of([defaultNext, paths])
+        return of({ graphFragment: {}, status: 'next' })
       } else if (paths.length === 0) {
-        return of([defaultComplete, paths])
+        return of({ graphFragment: {}, status: 'complete' })
       }
 
-      return from(model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Fragment>>).pipe(
-        mapSynchronous(projectNext, projectComplete, defaultNext, defaultComplete),
+      return from(model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Partial<Fragment>>>).pipe(
+        mapSynchronous<JSONEnvelope<Partial<Fragment>>, ChildProps>(projectNext, projectComplete, defaultNext, defaultComplete),
         catchError(errorHandler),
-        repeatWhen(graphChangeHandler),
-        map((props) => [props, paths])
+        repeatWhen(graphChangeHandler)
       )
-    }),
-    map(([props]) => props)
+    })
   )
 }

@@ -5,12 +5,12 @@ import { useStream } from './useStream'
 import { connect, Options } from './connect'
 
 
-export const UseFalcor = <Fragment extends Partial<TypedFragment> = Partial<TypedFragment>>(
+export const UseFalcor = <Fragment extends TypedFragment = TypedFragment>(
   model: Model,
   graphChange$: Observable<undefined>,
   options: Options = {}
 ) => {
-  const connectedModel = connect<Fragment>(model, graphChange$, options)
+  const connectedModel = connect(model, graphChange$, options)
 
-  return (pathSets: PathSet[]): ChildProps => useStream(connectedModel, pathSets) || { status: 'next', graphFragment: {} }
+  return (pathSets: PathSet[]): ChildProps<Partial<Fragment>> => useStream(connectedModel, pathSets) || { status: 'next', graphFragment: {} }
 }
