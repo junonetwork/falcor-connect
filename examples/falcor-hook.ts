@@ -15,6 +15,9 @@ const isLastPage = (page: number, length: number) => (page + 1) * PAGE_SIZE >= l
 
 
 export const TodoList: SFC = () => {
+  const [state, render] = useState(false)
+  const rerender = useCallback(() => render((x) => !x), [])
+
   const [page, setPage] = useState(0)
   const { status, graphFragment } = useFalcor([
     ['todos', { from: page * PAGE_SIZE, to: (page * PAGE_SIZE) + PAGE_SIZE - 1 }, ['label', 'status']],
@@ -22,11 +25,18 @@ export const TodoList: SFC = () => {
   ])
   const lengthSentinel = pathOr<Atom<number> | ErrorSentinel>({ $type: 'error', value: 'Error' }, ['todos', 'length'], graphFragment)
   const length = lengthSentinel.$type === 'atom' ? lengthSentinel.value : 0
-  const prevPage = useCallback(() => setPage(Math.max(page - 1, 0)), [page])
-  const nextPage = useCallback(() => setPage(Math.min(page + 1, Math.floor(length / PAGE_SIZE))), [page, length])
+  const prevPage = useCallback(() => setPage((page) => Math.max(page - 1, 0)), [])
+  const nextPage = useCallback(() => setPage((page) => Math.min(page + 1, Math.floor(length / PAGE_SIZE))), [length])
 
   console.log(status, graphFragment, page)
   return el('div', {},
+    el('div', {},
+      el('button', { onClick: prevPage, disabled: isFirstPage(page) }, 'previous'),
+      el('button', { onClick: nextPage, disabled: isLastPage(page, length) }, 'next'),
+      el('br'),
+      el('button', { onClick: rerender }, state ? 'rerender this' : 'rerender that'),
+      el('br'),
+      length === 0 ? null : el('p', {}, `${(page * PAGE_SIZE) + 1} to ${Math.min((page * PAGE_SIZE) + PAGE_SIZE, length)} of ${length}`)),
     el('ul', {},
       map(({ label, status }, idx) => (
         label.$type === 'error' || status.$type === 'error' ?
@@ -36,9 +46,5 @@ export const TodoList: SFC = () => {
             style: { textDecoration: status.value === 'complete' ? 'line-through' : 'none' },
           }, label.value)
       ),
-      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], graphFragment))),
-    el('div', {},
-      length === 0 ? null : el('p', {}, `${(page * PAGE_SIZE) + 1} to ${Math.min((page * PAGE_SIZE) + PAGE_SIZE, length)} of ${length}`),
-      el('button', { onClick: prevPage, disabled: isFirstPage(page) }, 'previous'),
-      el('button', { onClick: nextPage, disabled: isLastPage(page, length) }, 'next')))
+      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], graphFragment))))
 }

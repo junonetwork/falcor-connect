@@ -1,8 +1,9 @@
 import { Observable, of, from, Subscribable } from 'rxjs'
 import { PathSet, Model, JSONEnvelope } from 'falcor'
-import { TypedFragment, ErrorProps, NextProps, CompleteProps, ChildProps } from './types'
-import { catchError, repeatWhen, switchMap } from 'rxjs/operators'
-import { mapSynchronous } from './rxjs/mapSynchronous'
+import { TypedFragment, ErrorProps, ChildProps } from './types'
+import { catchError, repeatWhen, map, switchMap } from 'rxjs/operators'
+import { startWithSynchronous } from './rxjs/startWithSynchronous'
+import { endWithSynchronous } from './rxjs/endWithSynchronous'
 
 
 export type Options = {
@@ -61,10 +62,6 @@ export const connect = (
   graphChange$: Observable<undefined>,
   { errorHandler = defaultErrorHandler }: Options = {}
 ) => {
-  const projectNext = <Fragment>({ json: graphFragment }: JSONEnvelope<Fragment>): NextProps<Fragment> => ({ status: 'next', graphFragment })
-  const projectComplete = <Fragment>({ json: graphFragment }: JSONEnvelope<Fragment>): CompleteProps<Fragment> => ({ status: 'complete', graphFragment })
-  const defaultNext: NextProps = ({ graphFragment: {}, status: 'next' })
-  const defaultComplete: CompleteProps = { graphFragment: {}, status: 'complete' }
   const graphChangeHandler = () => graphChange$
 
   return <Fragment extends TypedFragment = TypedFragment>(
@@ -80,7 +77,9 @@ export const connect = (
       }
 
       return from(model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Partial<Fragment>>>).pipe(
-        mapSynchronous<JSONEnvelope<Partial<Fragment>>, ChildProps>(projectNext, projectComplete, defaultNext, defaultComplete),
+        map(({ json }) => ({ graphFragment: json, status: 'next' })),
+        startWithSynchronous((envelope) => ({ graphFragment: envelope === undefined ? {} : envelope.graphFragment, status: 'next' })),
+        endWithSynchronous((envelope) => ({ graphFragment: envelope === undefined ? {} : envelope.graphFragment, status: 'complete' })),
         catchError(errorHandler),
         repeatWhen(graphChangeHandler)
       )

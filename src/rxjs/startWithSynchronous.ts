@@ -1,26 +1,33 @@
 import { Observable } from 'rxjs'
 
 
-export const startWithSynchronous = <T>(defaultData: T) => (stream$: Observable<T>): Observable<T> => {
+export const startWithSynchronous = <T>(projectNext: (data?: T) => T) => (stream$: Observable<T>): Observable<T> => {
   return new Observable<T>((observer) => {
+    let _data: T | undefined
     let sync = true
-    let data: T | undefined
+    let complete = false
 
     const subscription = stream$.subscribe(
-      (emit) => {
-        data = emit
+      (data) => {
+        _data = data
         if (!sync) {
           observer.next(data)
         }
       },
       (error) => observer.error(error),
-      () => observer.complete(),
+      () => {
+        complete = true
+        if (!sync) {
+          observer.complete()
+        }
+      }
     )
 
     sync = false
+    observer.next(projectNext(_data))
 
-    if (data !== undefined) {
-      observer.next(defaultData)
+    if (complete) {
+      observer.complete()
     }
 
     return subscription

@@ -30,7 +30,7 @@ const FalcorRouter = Router.createClass([{
       }
 
       return pathValues
-    }, [])).pipe(delay(1000)) as unknown as ReturnType<GetRoute['get']>  
+    }, [])).pipe(delay(1000)) as unknown as ReturnType<GetRoute['get']>
   }
 }, {
   route: 'todos.length',
@@ -38,7 +38,7 @@ const FalcorRouter = Router.createClass([{
     return of({
       path: ['todos', 'length'],
       value: 17,
-    }) as unknown as ReturnType<GetRoute['get']>  
+    }).pipe(delay(1000)) as unknown as ReturnType<GetRoute['get']>
   }
 }])
 
