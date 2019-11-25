@@ -1,8 +1,8 @@
 import { JSONEnvelope, Path } from 'falcor'
 
 
-export type NextProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'next', graphFragment: JSONEnvelope<Fragment> | {}, error?: undefined }
-export type CompleteProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'complete', graphFragment: JSONEnvelope<Fragment> | {}, error?: undefined }
+export type NextProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'next', graphFragment: Fragment | {}, error?: undefined }
+export type CompleteProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'complete', graphFragment: Fragment | {}, error?: undefined }
 export type ErrorProps = { status: 'error', graphFragment: {}, error: Error }
 export type ChildProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = NextProps<Fragment> | CompleteProps<Fragment> | ErrorProps
 
