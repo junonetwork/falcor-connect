@@ -1,9 +1,8 @@
 import { SFC, createElement as el, useState, useCallback } from 'react'
 import { useStream } from '../src'
-import { switchMap, scan, take, startWith, map, takeWhile, multicast, mergeScan, tap, delay, catchError } from 'rxjs/operators'
-import { interval, of, iif, throwError, Subject, AsyncSubject, Observable } from 'rxjs'
+import { switchMap, startWith, map, tap, delay, catchError } from 'rxjs/operators'
+import { of, iif, throwError, Observable } from 'rxjs'
 import { range } from 'ramda'
-import { useStreamNaive } from '../src/useStream'
 
 
 const switchScan = <T, R>(

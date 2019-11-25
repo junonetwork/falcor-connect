@@ -1,13 +1,7 @@
 import { SFC, createElement as el, useState, useCallback } from 'react'
 import { useStream } from '../src'
-import { switchMap, scan, take, startWith, map, takeWhile, multicast, mergeScan, tap, delay } from 'rxjs/operators'
-import { interval, of, iif, throwError, Subject, AsyncSubject, Observable } from 'rxjs'
-import { range } from 'ramda'
-import { useStreamNaive } from '../src/useStream'
-// import { model, graphChange$ } from './model'
-// import { WithFalcor } from '../src/WithFalcor'
-
-// const withFalcor = WithFalcor(model, graphChange$)
+import { switchMap, scan, take, startWith } from 'rxjs/operators'
+import { interval } from 'rxjs'
 
 
 export const Widget: SFC<{}> = () => {

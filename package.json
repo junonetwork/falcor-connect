@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/falcor": "^2.0.0",
+    "@types/falcor-router": "^0.8.0",
     "@types/ramda": "^0.26.21",
     "@types/react-dom": "^16.9.1",
     "@types/react-router-dom": "^5.1.0",
@@ -31,6 +32,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "eslint": "^6.2.2",
     "falcor": "^2.1.0",
+    "falcor-router": "^0.8.3",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
