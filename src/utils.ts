@@ -26,6 +26,10 @@ export const isErrorSentinel = (fragment: any): fragment is ErrorSentinel => {
   return propEq('$type', 'error', fragment)
 }
 
+export const isEmpty = (fragment: any): fragment is Atom<null> => {
+  return fragment === undefined || fragment.value === null
+}
+
 export const isAtom = <T = any>(atom: any, value?: T): atom is Atom<T> => {
   if (atom === undefined || atom.$type !== 'atom') {
     return false
@@ -45,10 +49,8 @@ export const map = <T, R>(project: (item: T, index: number) => R, falcorList: Fa
   }
 
   for (const key in falcorList) {
-    if (key !== 'length' && key !== '$__path') {
-      if (!isErrorSentinel(falcorList[key])) {
-        result.push(project(falcorList[key], parseInt(key, 10)))
-      }
+    if (key !== 'length' && key !== '$__path' && !isErrorSentinel(falcorList[key]) && !isEmpty(falcorList[key])) {
+      result.push(project(falcorList[key], parseInt(key, 10)))
     }
   }
 
