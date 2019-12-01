@@ -1,10 +1,10 @@
-import { JSONEnvelope, Path } from 'falcor'
+import { Path } from 'falcor'
 
 
-export type NextProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'next', graphFragment: Fragment | {}, error?: undefined }
-export type CompleteProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = { status: 'complete', graphFragment: Fragment | {}, error?: undefined }
+export type NextProps<Fragment = TypedFragment> = { status: 'next', graphFragment: Partial<Fragment> | {}, error?: undefined }
+export type CompleteProps<Fragment = TypedFragment> = { status: 'complete', graphFragment: Partial<Fragment> | {}, error?: undefined }
 export type ErrorProps = { status: 'error', graphFragment: {}, error: Error }
-export type ChildProps<Fragment extends Partial<TypedFragment> = Partial<TypedFragment>> = NextProps<Fragment> | CompleteProps<Fragment> | ErrorProps
+export type ChildProps<Fragment = TypedFragment> = NextProps<Fragment> | CompleteProps<Fragment> | ErrorProps
 
 export type Atom<T = any> = { $type: 'atom', value: T }
 export type Ref = { $type: 'ref', value: Path }

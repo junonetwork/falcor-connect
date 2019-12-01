@@ -40,7 +40,6 @@ export const isAtom = <T = any>(atom: any, value?: T): atom is Atom<T> => {
   return equals(value, atom.value)
 }
 
-
 export const map = <T, R>(project: (item: T, index: number) => R, falcorList: FalcorList<T> | ErrorSentinel): R[] => {
   const result: R[] = []
 

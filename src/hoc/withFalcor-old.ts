@@ -2,8 +2,8 @@ import { of, merge, from, empty, Observable, Subscribable, Subject, Subscription
 import { switchMap, startWith, map as mapRx, catchError, repeatWhen, auditTime, last } from 'rxjs/operators'
 import { PathSet, Model, JSONEnvelope } from 'falcor'
 import { ComponentType, createElement, Component } from 'react'
-import { TypedFragment, ChildProps, ErrorProps } from './types'
-import { isPathSets } from './utils'
+import { TypedFragment, ChildProps, ErrorProps } from '../types'
+import { isPathSets } from '../utils'
 
 
 export type Options<Props> = {

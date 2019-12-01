@@ -1,7 +1,10 @@
-export { useStream } from './useStream'
-export { UseFalcor } from './useFalcor'
+export { useStream } from './hook/useStream'
+export { useStreamCallback } from './hook/useStreamCallback'
+export { UseFalcor } from './hook/useFalcor'
+export { UseFalcorSet } from './hook/useFalcorSet'
+export { UseFalcorCall } from './hook/useFalcorCall'
 export { mapPropsStream } from './mapPropsStream'
-export { WithFalcor } from './withFalcor'
+export { WithFalcor } from './hoc/withFalcor'
 export {
   isPathSets,
   isErrorSentinel,

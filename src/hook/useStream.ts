@@ -30,7 +30,7 @@ import { Observable, Subject } from 'rxjs'
  */
 export const useStream = <T, R>(
   project: (stream$: Observable<T>) => Observable<R>,
-  data: T,
+  data?: T,
 ): R | undefined => {
   const result = useRef<R>()
   const synchronous = useRef(true)
