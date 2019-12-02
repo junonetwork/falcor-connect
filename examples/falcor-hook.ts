@@ -1,7 +1,7 @@
-import { createElement as el, SFC, useState, useCallback } from 'react'
+import { createElement as el, SFC, useState, useCallback, useRef } from 'react'
 import { pathOr } from 'ramda'
 import { model, graphChange$ } from './model'
-import { FalcorList, TerminalSentinel, map, UseFalcor, ErrorSentinel, Atom, UseFalcorSet, UseFalcorCall } from '../src'
+import { FalcorList, TerminalSentinel, map, UseFalcor, ErrorSentinel, Atom, UseFalcorSet, UseFalcorCall, TypedFragment } from '../src'
 
 
 type Todo = { label: TerminalSentinel<string>, status: TerminalSentinel<'pending' | 'complete'> }
@@ -39,7 +39,10 @@ export const TodoList: SFC = () => {
   )
   const { handler: createTodo } = useFalcorCall(() => ['todos', 'create'])
 
-  console.log(status, graphFragment, page)
+  const prev = useRef<{} | Partial<TypedFragment>>()
+  console.log(status, graphFragment, prev.current === graphFragment)
+  prev.current = graphFragment
+
   return el('div', {},
     el('div', {},
       el('button', { onClick: prevPage, disabled: isFirstPage(page) }, 'previous'),
