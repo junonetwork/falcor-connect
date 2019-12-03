@@ -19,5 +19,8 @@ render((
     el(Route, { path: '/use-stream', component: Widget }),
     el(Route, { path: '/use-stream-cached', component: CachedWidget }),
     el(Route, { path: '/with-falcor', component: TodoList }),
-    el(Route, { path: '/use-falcor', component: TodoListHook }))
+    el(Route, { path: '/use-falcor' },
+      el('div', { style: { display: 'grid', gridTemplateColumns: '50% 50%' } },
+        el(TodoListHook, { panel: 'left' }),
+        el(TodoListHook, { panel: 'right' }))))
 ), document.getElementById('app'))

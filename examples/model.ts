@@ -14,7 +14,6 @@ export const {
 const FalcorRouter = Router.createClass([{
   route: 'todos[{integers}]["label", "status"]',
   get: ([_, indices]: [string, number[]]) => {
-    console.log('CACHE HIT')
     return of(indices.reduce<PathValue[]>((pathValues, idx) => {
       if (idx < 17) {
         pathValues.push({
@@ -63,7 +62,8 @@ const FalcorRouter = Router.createClass([{
 export const model = new Model({
   source: new FalcorRouter(),
   onChange: graphChange as () => void,
-  maxSize: 1,
+  // onChange: () => { console.log('CHANGE'); graphChange(); }
+  // maxSize: 1,
 })
   .batch()
   .boxValues()

@@ -4,6 +4,8 @@ import { model, graphChange$ } from './model'
 import { FalcorList, TerminalSentinel, map, UseFalcor, ErrorSentinel, Atom, UseFalcorSet, UseFalcorCall, TypedFragment } from '../src'
 
 
+type Props = { panel: 'left' | 'right' }
+
 type Todo = { label: TerminalSentinel<string>, status: TerminalSentinel<'pending' | 'complete'> }
 
 
@@ -16,7 +18,7 @@ const isFirstPage = (page: number) => page === 0
 const isLastPage = (page: number, length: number) => (page + 1) * PAGE_SIZE >= length
 
 
-export const TodoList: SFC = () => {
+export const TodoList: SFC<Props> = (props) => {
   const [state, render] = useState(false)
   const [page, setPage] = useState(0)
 
@@ -40,7 +42,7 @@ export const TodoList: SFC = () => {
   const { handler: createTodo } = useFalcorCall(() => ['todos', 'create'])
 
   const prev = useRef<{} | Partial<TypedFragment>>()
-  console.log(status, graphFragment, prev.current === graphFragment)
+  console.log(props.panel, status, graphFragment, prev.current === graphFragment)
   prev.current = graphFragment
 
   return el('div', {},
@@ -57,7 +59,9 @@ export const TodoList: SFC = () => {
         status === 'next' || toggleStatusStatus === 'next' ? el('span', {}, '...loading') : null)),
     el('ul', {},
       map(({ label, status }, idx) => (
-        label.$type === 'error' || status.$type === 'error' || status.value === null || status.value === undefined ?
+        label === undefined || status === undefined || status.value === null || status.value === undefined ?
+          null :
+        label.$type === 'error' || status.$type === 'error' ?
           el('li', { key: idx }, 'Error') :
           el('li', {
             key: idx,

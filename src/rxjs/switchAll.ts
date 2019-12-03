@@ -14,17 +14,14 @@ export const switchAll = <T>() => (props$: Observable<Observable<T>>) => {
         prevInnerSubscription = innerSubscription
       },
       error: (error) => {
-        console.error(error)
         observer.error(error)
       },
       complete: () => {
-        console.log('COMPLETE')
         observer.complete()
       },
     })
 
     return () => {
-      console.log('UNSUBSCRIBE')
       if (prevInnerSubscription !== undefined) prevInnerSubscription.unsubscribe()
       subscription.unsubscribe()
     }
