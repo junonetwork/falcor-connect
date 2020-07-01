@@ -6,9 +6,9 @@ export const switchScan = <T, R>(
   accumulator: (acc: R, value: T, index: number) => Observable<R>,
   seed: R
 ) => (source$: Observable<T>) => {
-  let acc = seed
-  return source$.pipe(
-    switchMap((value, index) => accumulator(acc, value, index)),
-    tap((value) => acc = value)
-  )
-}
+    let acc = seed
+    return source$.pipe(
+      switchMap((value, index) => accumulator(acc, value, index)),
+      tap((value) => acc = value)
+    )
+  }

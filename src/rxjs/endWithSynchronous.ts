@@ -3,7 +3,7 @@ import { debounceTime } from 'rxjs/operators'
 
 
 export const endWithSynchronous = <T>(projectComplete: (data?: T) => T) => (stream$: Observable<T>): Observable<T> => {
-  return new Observable<T>((observer) => {    
+  return new Observable<T>((observer) => {
     return new Observable<T>((innerObserver) => {
       let _data: T | undefined
       let sync = true
@@ -25,7 +25,7 @@ export const endWithSynchronous = <T>(projectComplete: (data?: T) => T) => (stre
           }
         }
       })
-  
+
       sync = false
 
       if (complete) {
@@ -34,7 +34,7 @@ export const endWithSynchronous = <T>(projectComplete: (data?: T) => T) => (stre
       } else if (_data !== undefined) {
         observer.next(_data)
       }
-  
+
       return subscription
     })
       .pipe(debounceTime(0))

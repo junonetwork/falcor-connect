@@ -25,13 +25,11 @@ export const TodoList = compose<{ page: number, setPage: (page: number) => void 
     ['todos', { from: page * PAGE_SIZE, to: (page * PAGE_SIZE) + PAGE_SIZE - 1 }, ['label', 'status']],
     ['todos', 'length']
   ])
-)(({ page, setPage, status, graphFragment }) => {
-  const lengthSentinel = pathOr<Atom<number> | ErrorSentinel>({ $type: 'error', value: 'Error' }, ['todos', 'length'], graphFragment)
+)(({ page, setPage, fragment }) => {
+  const lengthSentinel = pathOr<Atom<number> | ErrorSentinel>({ $type: 'error', value: 'Error' }, ['todos', 'length'], fragment)
   const length = lengthSentinel.$type === 'atom' ? lengthSentinel.value : 0
   const prevPage = useCallback(() => setPage(Math.max(page - 1, 0)), [page])
   const nextPage = useCallback(() => setPage(Math.min(page + 1, Math.floor(length / PAGE_SIZE))), [page, length])
-
-  console.log(status, graphFragment)
 
   return el('div', {},
     el('ul', {},
@@ -43,7 +41,7 @@ export const TodoList = compose<{ page: number, setPage: (page: number) => void 
           }, label.value) :
           el('li', { key: idx }, 'Error')
       ),
-      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], graphFragment))),
+      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], fragment))),
     el('div', {},
       length === 0 ? null : el('p', {}, `${(page * PAGE_SIZE) + 1} to ${Math.min((page * PAGE_SIZE) + PAGE_SIZE, length)} of ${length}`),
       el('button', { onClick: prevPage, disabled: isFirstPage(page) }, 'previous'),

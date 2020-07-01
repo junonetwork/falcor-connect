@@ -1,25 +1,26 @@
-import { from, Subscribable } from 'rxjs'
+import { useState } from 'react'
+import { from, Subscribable, Observable } from 'rxjs'
 import { Model, Path, PathSet, JSONEnvelope } from 'falcor'
-import { useStreamCallback, TypedFragment, ChildProps } from '..'
+import { useStreamCallback } from '..'
 import { switchMap, catchError, map } from 'rxjs/operators'
 import { Options, defaultErrorHandler } from '../connect'
 import { startWithSynchronous } from '../rxjs/startWithSynchronous'
 import { endWithSynchronous } from '../rxjs/endWithSynchronous'
-import { useState } from 'react'
+import { Fragment, ChildProps } from '../types'
 
 
 // export const UseFalcorCall = (
 //   model: Model,
 //   { errorHandler = defaultErrorHandler }: Options = {}
 // ) => {
-//   return <T, Fragment = TypedFragment>(
+//   return <T, F = Fragment>(
 //     path: (data: T) => Path,
 //     args?: (data: T) => any[],
 //     refPaths?: (data: T) => PathSet[],
 //     thisPaths?: (data: T) => PathSet[],
-//     observer?: PartialObserver<JSONEnvelope<Fragment>>
+//     observer?: PartialObserver<JSONEnvelope<F>>
 //   ) => {
-//     return useStreamCallback<T, JSONEnvelope<Fragment>>(
+//     return useStreamCallback<T, JSONEnvelope<F>>(
 //       (stream$) => stream$.pipe(
 //         switchMap((data) => {
 //           return model.call(
@@ -27,7 +28,7 @@ import { useState } from 'react'
 //             args ? args(data) : [],
 //             refPaths ? refPaths(data) : [],
 //             thisPaths ? thisPaths(data) : []
-//           ) as unknown as Observable<JSONEnvelope<Fragment>>
+//           ) as unknown as Observable<JSONEnvelope<F>>
 //         }),
 //         catchError(errorHandler),
 //       ),
@@ -41,15 +42,15 @@ export const UseFalcorCall = (
   model: Model,
   { errorHandler = defaultErrorHandler }: Options = {}
 ) => {
-  return <T, Fragment = TypedFragment>(
+  return <T = void, F extends Fragment = Fragment>(
     path: (data: T) => Path,
-    args?: (data: T) => any[],
+    args?: (data: T) => unknown[],
     refPaths?: (data: T) => PathSet[],
     thisPaths?: (data: T) => PathSet[],
-  ): ChildProps<Fragment> & { handler: (data?: T) => void } => {
-    const [props, setState] = useState<ChildProps<Fragment>>({ status: 'complete', graphFragment: {} })
+  ): ChildProps<F> & { handler: (data: T) => void } => {
+    const [props, setState] = useState<ChildProps<F>>({ status: 'complete', fragment: {} })
 
-    const handler = useStreamCallback<T, ChildProps<Fragment>>(
+    const handler = useStreamCallback<T, ChildProps<F>>(
       (stream$) => stream$.pipe(
         switchMap((data) => {
           return from(model.call(
@@ -57,11 +58,11 @@ export const UseFalcorCall = (
             args ? args(data) : [],
             refPaths ? refPaths(data) : [],
             thisPaths ? thisPaths(data) : []
-          ) as unknown as Subscribable<JSONEnvelope<Partial<Fragment>>>).pipe(
-            map(({ json }) => ({ graphFragment: json, status: 'next' })),
-            startWithSynchronous((envelope) => ({ graphFragment: envelope === undefined ? {} : envelope.graphFragment, status: 'next' })),
-            endWithSynchronous((envelope) => ({ graphFragment: envelope === undefined ? {} : envelope.graphFragment, status: 'complete' })),
-            catchError(errorHandler),
+          ) as unknown as Subscribable<JSONEnvelope<Partial<F>>>).pipe(
+            map<JSONEnvelope<Partial<F>>, ChildProps<F>>(({ json }) => ({ fragment: json, status: 'next' as const })),
+            startWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'next' as const })),
+            endWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' as const })),
+            catchError<ChildProps<F>, Observable<ChildProps<F>>>(errorHandler),
           )
         })
       ),

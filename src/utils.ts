@@ -1,9 +1,9 @@
 import { PathSet } from 'falcor'
 import { equals, propEq } from 'ramda'
-import { ErrorSentinel, Atom, FalcorList } from './types'
+import { ErrorSentinel, Atom, FalcorList, Sentinel } from './types'
 
 
-export const isPathSets = (paths: any): paths is PathSet[] => {
+export const isPathSets = (paths: unknown): paths is PathSet[] => {
   if (!Array.isArray(paths)) {
     return false
   }
@@ -22,22 +22,22 @@ export const isPathSets = (paths: any): paths is PathSet[] => {
 }
 
 
-export const isErrorSentinel = (fragment: any): fragment is ErrorSentinel => {
-  return propEq('$type', 'error', fragment)
+export const isErrorSentinel = (fragment: unknown): fragment is ErrorSentinel => {
+  return propEq('$type', 'error', fragment as Record<string, unknown>)
 }
 
-export const isEmpty = (fragment: any): fragment is Atom<null> => {
-  return fragment === undefined || fragment.value === null
+export const isEmpty = (fragment: unknown) => {
+  return fragment === undefined || (fragment as Atom<unknown>).value === null
 }
 
-export const isAtom = <T = any>(atom: any, value?: T): atom is Atom<T> => {
-  if (atom === undefined || atom.$type !== 'atom') {
+export const isAtom = <T = unknown>(atom: unknown, value?: T): atom is Atom<T> => {
+  if (atom === undefined || (atom as Sentinel).$type !== 'atom') {
     return false
   } else if (value === undefined) {
     return true
   }
 
-  return equals(value, atom.value)
+  return equals(value, (atom as Atom<unknown>).value)
 }
 
 export const map = <T, R>(project: (item: T, index: number) => R, falcorList: FalcorList<T> | ErrorSentinel): R[] => {

@@ -6,8 +6,8 @@ import { createElement, ComponentType, Component } from 'react'
 export const mapPropsStream = <InnerProps, OutterProps>(
   project: (props$: Observable<OutterProps>) => Observable<InnerProps>
 ) => (wrappedComponent: ComponentType<InnerProps>) =>
-  class MapPropsStream extends Component<OutterProps> {
-    
+    class MapPropsStream extends Component<OutterProps> {
+
     state: { mappedProps: InnerProps | undefined } = { mappedProps: undefined }
     props$ = new Subject<OutterProps>()
     subscription!: Subscription
@@ -35,4 +35,4 @@ export const mapPropsStream = <InnerProps, OutterProps>(
         null :
         createElement(wrappedComponent, this.state.mappedProps)
     }
-  }
+    }

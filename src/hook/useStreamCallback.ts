@@ -5,7 +5,7 @@ import { Observable, ReplaySubject, PartialObserver } from 'rxjs'
 export const useStreamCallback = <T, R = unknown>(
   project: (stream$: Observable<T>) => Observable<R>,
   observer?: PartialObserver<R>,
-): (data?: T) => void => {
+): (data: T) => void => {
   const stream$ = useRef(new ReplaySubject<T>())
 
   useLayoutEffect(() => {

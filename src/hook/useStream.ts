@@ -15,7 +15,7 @@ import { Observable, Subject } from 'rxjs'
  *   - tests infinite loop prevention where stream next emit triggers another event to be dispatched
  *   - not sure if this is fixed.  see below implementation
  * - calling useStream on a synchronous stream should return: data1...data2...data3
- * 
+ *
  * maybe test as a matrix against
  * - stream types
  *   - stream that emits once synchronous  :data
@@ -30,7 +30,7 @@ import { Observable, Subject } from 'rxjs'
  */
 export const useStream = <T, R>(
   project: (stream$: Observable<T>) => Observable<R>,
-  data?: T,
+  data: T,
 ): R | undefined => {
   const result = useRef<R>()
   const synchronous = useRef(true)

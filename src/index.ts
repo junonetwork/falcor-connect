@@ -23,5 +23,5 @@ export {
   ComplexType,
   FalcorList,
   TerminalSentinel,
-  TypedFragment
+  Fragment
 } from './types'

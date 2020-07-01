@@ -1,7 +1,7 @@
 import { createElement as el, SFC, useState, useCallback, useRef } from 'react'
 import { pathOr } from 'ramda'
 import { model, graphChange$ } from './model'
-import { FalcorList, TerminalSentinel, map, UseFalcor, ErrorSentinel, Atom, UseFalcorSet, UseFalcorCall, TypedFragment } from '../src'
+import { FalcorList, TerminalSentinel, map, UseFalcor, ErrorSentinel, Atom, UseFalcorSet, UseFalcorCall, Fragment } from '../src'
 
 
 type Props = { panel: 'left' | 'right' }
@@ -22,14 +22,14 @@ export const TodoList: SFC<Props> = (props) => {
   const [state, render] = useState(false)
   const [page, setPage] = useState(0)
 
-  const { status, graphFragment } = useFalcor([
+  const { status, fragment } = useFalcor([
     ['todos', { from: page * PAGE_SIZE, to: (page * PAGE_SIZE) + PAGE_SIZE - 1 }, ['label', 'status']],
     ['todos', 'length']
   ])
 
-  const lengthSentinel = pathOr<Atom<number> | ErrorSentinel>({ $type: 'error', value: 'Error' }, ['todos', 'length'], graphFragment)
+  const lengthSentinel = pathOr<Atom<number> | ErrorSentinel>({ $type: 'error', value: 'Error' }, ['todos', 'length'], fragment)
   const length = lengthSentinel.$type === 'atom' ? lengthSentinel.value : 0
-  
+
   const prevPage = useCallback(() => setPage((page) => Math.max(page - 1, 0)), [])
   const nextPage = useCallback(() => setPage((page) => Math.min(page + 1, Math.floor(length / PAGE_SIZE))), [length])
   const rerender = useCallback(() => render((x) => !x), [])
@@ -41,9 +41,9 @@ export const TodoList: SFC<Props> = (props) => {
   )
   const { handler: createTodo } = useFalcorCall(() => ['todos', 'create'])
 
-  const prev = useRef<{} | Partial<TypedFragment>>()
-  console.log(props.panel, status, graphFragment, prev.current === graphFragment)
-  prev.current = graphFragment
+  const prev = useRef<{} | Partial<Fragment>>()
+  console.log(props.panel, status, fragment, prev.current === fragment)
+  prev.current = fragment
 
   return el('div', {},
     el('div', {},
@@ -54,21 +54,21 @@ export const TodoList: SFC<Props> = (props) => {
       el('br'),
       el('button', { onClick: rerender }, state ? 'rerender this' : 'rerender that'),
       el('br'),
-      el('p', {}, 
+      el('p', {},
         length === 0 ? null : el('span', {}, `${(page * PAGE_SIZE) + 1} to ${Math.min((page * PAGE_SIZE) + PAGE_SIZE, length)} of ${length}`),
         status === 'next' || toggleStatusStatus === 'next' ? el('span', {}, '...loading') : null)),
     el('ul', {},
       map(({ label, status }, idx) => (
         label === undefined || status === undefined || status.value === null || status.value === undefined ?
           null :
-        label.$type === 'error' || status.$type === 'error' ?
-          el('li', { key: idx }, 'Error') :
-          el('li', {
-            key: idx,
-            style: { textDecoration: status.value === 'complete' ? 'line-through' : 'none' },
-          },
+          label.$type === 'error' || status.$type === 'error' ?
+            el('li', { key: idx }, 'Error') :
+            el('li', {
+              key: idx,
+              style: { textDecoration: status.value === 'complete' ? 'line-through' : 'none' },
+            },
             el('span', {}, label.value),
             el('button', { onClick: () => toggleStatus({ idx, status: status.value }) }, 'X'))
       ),
-      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], graphFragment))))
+      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], fragment))))
 }

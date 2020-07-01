@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs'
 import { PathSet, Model } from 'falcor'
-import { TypedFragment, ChildProps } from '../types'
+import { Fragment, ChildProps } from '../types'
 import { useStream } from './useStream'
 import { connect, Options } from '../connect'
 
@@ -12,7 +12,7 @@ export const UseFalcor = (
 ) => {
   const connectedModel = connect(model, graphChange$, options)
 
-  return <Fragment = TypedFragment>(pathSets: PathSet[]): ChildProps<Fragment> => (
-    useStream(connectedModel, pathSets) || { status: 'next', graphFragment: {} }
-  )
+  return <T extends Fragment = Fragment>(pathSets: PathSet[]): ChildProps<T> => {
+    return useStream(connectedModel, pathSets) ?? { status: 'next', fragment: {} }
+  }
 }
