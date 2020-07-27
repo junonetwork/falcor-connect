@@ -1,6 +1,6 @@
 {
   "name": "falcor-connect",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "react-falcor bindings",
   "main": "dist/index.js",
   "scripts": {
