@@ -1,7 +1,7 @@
 import { Model, PathValue } from 'falcor'
 import Router, { GetRoute, SetRoute, CallRoute } from 'falcor-router'
 import { createEventHandler } from 'recompose'
-import { Observable, of, never } from 'rxjs'
+import { of, never, Observable } from 'rxjs'
 import { delay } from 'rxjs/operators'
 import { Atom } from '../src/types'
 
@@ -9,7 +9,7 @@ import { Atom } from '../src/types'
 export const {
   stream: graphChange$,
   handler: graphChange,
-} = createEventHandler<void, Observable<undefined>>()
+} = createEventHandler<void, Observable<void>>()
 
 const FalcorRouter = Router.createClass([{
   route: 'todos[{integers}]["label", "status"]',

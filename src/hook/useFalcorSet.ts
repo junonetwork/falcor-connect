@@ -3,7 +3,7 @@ import { Model, PathValue, JSONEnvelope } from 'falcor'
 import { useStreamCallback } from '..'
 import { switchMap, catchError, map } from 'rxjs/operators'
 import { useState } from 'react'
-import { Fragment, ChildProps } from '../types'
+import { Fragment, ChildProps, NextProps, CompleteProps } from '../types'
 import { Options, defaultErrorHandler } from '../connect'
 import { startWithSynchronous } from '../rxjs/startWithSynchronous'
 import { endWithSynchronous } from '../rxjs/endWithSynchronous'
@@ -40,9 +40,9 @@ export const UseFalcorSet = (
       (stream$) => stream$.pipe(
         switchMap((data) => {
           return from(model.set(...pathValue(data)) as unknown as Subscribable<JSONEnvelope<Partial<F>>>).pipe(
-            map<JSONEnvelope<Partial<F>>, ChildProps<F>>(({ json }) => ({ fragment: json, status: 'next' as const })),
-            startWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'next' as const })),
-            endWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' as const })),
+            map<JSONEnvelope<Partial<F>>, NextProps<F>>(({ json }) => ({ fragment: json, status: 'next' })),
+            startWithSynchronous({ fragment: {}, status: 'next' as const }),
+            endWithSynchronous<NextProps<F> | CompleteProps<F>>((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' })),
             catchError<ChildProps<F>, Observable<ChildProps<F>>>(errorHandler),
           )
         }),

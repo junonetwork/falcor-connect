@@ -8,6 +8,6 @@ exports.UseFalcor = function (model, graphChange$, options) {
     var connectedModel = connect_1.connect(model, graphChange$, options);
     return function (pathSets) {
         var _a;
-        return (_a = useStream_1.useStream(connectedModel, pathSets)) !== null && _a !== void 0 ? _a : { status: 'next', fragment: {} };
+        return (_a = useStream_1.useStream(connectedModel, pathSets)) !== null && _a !== void 0 ? _a : { fragment: {}, status: 'next' };
     };
 };

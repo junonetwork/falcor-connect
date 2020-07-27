@@ -27,7 +27,7 @@ exports.UseFalcorCall = function (model, _a) {
             return rxjs_1.from(model.call(path(data), args ? args(data) : [], refPaths ? refPaths(data) : [], thisPaths ? thisPaths(data) : [])).pipe(operators_1.map(function (_a) {
                 var json = _a.json;
                 return ({ fragment: json, status: 'next' });
-            }), startWithSynchronous_1.startWithSynchronous(function (envelope) { return ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'next' }); }), endWithSynchronous_1.endWithSynchronous(function (envelope) { return ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' }); }), operators_1.catchError(errorHandler));
+            }), startWithSynchronous_1.startWithSynchronous({ fragment: {}, status: 'next' }), endWithSynchronous_1.endWithSynchronous(function (envelope) { return ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' }); }), operators_1.catchError(errorHandler));
         })); }, { next: function (props) { return setState(props); } });
         return __assign(__assign({}, props), { handler: handler });
     };

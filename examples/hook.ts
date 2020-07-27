@@ -4,7 +4,7 @@ import { switchMap, scan, take, startWith } from 'rxjs/operators'
 import { interval } from 'rxjs'
 
 
-export const Widget: SFC<{}> = () => {
+export const Widget: SFC = () => {
   const [channel, setChannel] = useState('friend-list')
   const selectChannel = useCallback(({ target: { value } }) => setChannel(value), [])
   const next = useStream((stream$) => stream$.pipe(
@@ -20,9 +20,9 @@ export const Widget: SFC<{}> = () => {
   return el('div', null,
     el('div', null,
       el('select', { value: channel, onChange: selectChannel },
-       el('option', { value: 'friend-list' }, 'Friends'),
-       el('option', { value: 'enemy-list' }, 'Enemies'),
-       el('option', { value: 'grocery-list' }, 'Groceries'))),
+        el('option', { value: 'friend-list' }, 'Friends'),
+        el('option', { value: 'enemy-list' }, 'Enemies'),
+        el('option', { value: 'grocery-list' }, 'Groceries'))),
     el('h1', null, channel),
     el('ul', null, ...(next || []).map((item, idx) => (
       el('li', { key: idx }, item))))

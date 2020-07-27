@@ -15,7 +15,7 @@ const defaultErrorHandler = <Props>(error: Error, props: Props): Observable<Erro
 })
 
 
-export const connect = (model: Model, graphChange$: Observable<undefined>) => <Props, F extends Partial<Fragment> = Partial<Fragment>>(
+export const connect = (model: Model, graphChange$: Observable<void>) => <Props, F extends Partial<Fragment> = Partial<Fragment>>(
   paths: PathSet[] | ((props: Props) => PathSet[] | Error | null),
   { errorHandler = defaultErrorHandler }: Options<Props> = {}
 ) => (props$: Observable<Props>): Observable<Props & ChildProps<F>> => (
@@ -118,7 +118,7 @@ export const mapPropsStream = <InnerProps, OutterProps>(
   }
 
 
-export const ComposeFalcor = (model: Model, graphChange$: Observable<undefined>) => {
+export const ComposeFalcor = (model: Model, graphChange$: Observable<void>) => {
   const connectedModel = connect(model, graphChange$)
 
   return <Props, F extends Partial<Fragment> = Partial<Fragment>>(
@@ -141,7 +141,7 @@ export const ComposeFalcor = (model: Model, graphChange$: Observable<undefined>)
 }
 
 
-export const WithFalcor = (model: Model, graphChange$: Observable<undefined>) => {
+export const WithFalcor = (model: Model, graphChange$: Observable<void>) => {
   const connectedModel = connect(model, graphChange$)
 
   return <Props, F extends Partial<Fragment> = Partial<Fragment>>(

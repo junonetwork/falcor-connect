@@ -6,16 +6,16 @@ import { mapPropsStream } from '../mapPropsStream'
 import { connect, Options } from '../connect'
 
 
-export const WithFalcor = <Props, F extends Fragment = Fragment>(model: Model, graphChange$: Observable<undefined>, options: Options = {}) => {
+export const WithFalcor = (model: Model, graphChange$: Observable<void>, options: Options = {}) => {
   const connectedModel = connect(model, graphChange$, options)
 
-  return (
+  return <Props, F extends Fragment = Fragment>(
     paths: PathSet[] | Error | null | ((props: Props) => PathSet[] | Error | null),
   ) => mapPropsStream<ChildProps<F> & Props, Props>((props$) => combineLatest(
     props$,
     props$.pipe(
       map((props) => typeof paths === 'function' ? paths(props) : paths),
-      connectedModel
+      connectedModel as (pathSets$: Observable<Error | PathSet[] | null>) => Observable<ChildProps<F>>
     )
   ).pipe(
     map(([props, falcorProps]) => ({ ...falcorProps, ...props }))

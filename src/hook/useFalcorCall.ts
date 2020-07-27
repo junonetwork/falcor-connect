@@ -6,7 +6,7 @@ import { switchMap, catchError, map } from 'rxjs/operators'
 import { Options, defaultErrorHandler } from '../connect'
 import { startWithSynchronous } from '../rxjs/startWithSynchronous'
 import { endWithSynchronous } from '../rxjs/endWithSynchronous'
-import { Fragment, ChildProps } from '../types'
+import { Fragment, ChildProps, NextProps, CompleteProps } from '../types'
 
 
 // export const UseFalcorCall = (
@@ -59,9 +59,9 @@ export const UseFalcorCall = (
             refPaths ? refPaths(data) : [],
             thisPaths ? thisPaths(data) : []
           ) as unknown as Subscribable<JSONEnvelope<Partial<F>>>).pipe(
-            map<JSONEnvelope<Partial<F>>, ChildProps<F>>(({ json }) => ({ fragment: json, status: 'next' as const })),
-            startWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'next' as const })),
-            endWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' as const })),
+            map<JSONEnvelope<Partial<F>>, NextProps<F>>(({ json }) => ({ fragment: json, status: 'next' })),
+            startWithSynchronous({ fragment: {}, status: 'next' as const }),
+            endWithSynchronous<NextProps<F> | CompleteProps<F>>((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' })),
             catchError<ChildProps<F>, Observable<ChildProps<F>>>(errorHandler),
           )
         })
@@ -69,9 +69,6 @@ export const UseFalcorCall = (
       { next: (props) => setState(props) }
     )
 
-    return {
-      ...props,
-      handler,
-    }
+    return { ...props, handler }
   }
 }

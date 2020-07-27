@@ -17,7 +17,7 @@ import { ChildProps, FalcorList, WithFalcor } from '../src'
 const {
   stream: graphChange$,
   handler: graphChange,
-} = createEventHandler<undefined, Observable<undefined>>()
+} = createEventHandler<void, Observable<void>>()
 
 const model = new Model({
   cache: {},

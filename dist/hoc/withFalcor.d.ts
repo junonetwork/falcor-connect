@@ -3,7 +3,7 @@
 import { Model, PathSet } from 'falcor';
 import { Observable } from 'rxjs';
 import { Options } from '../connect';
-export declare const WithFalcor: <Props, F extends Record<string, unknown> = Record<string, unknown>>(model: Model, graphChange$: Observable<undefined>, options?: Options) => (paths: Error | PathSet[] | ((props: Props) => PathSet[] | Error | null) | null) => (wrappedComponent: import("react").ComponentType<(import("../types").ErrorProps & Props) | (import("../types").NextProps<F> & Props) | (import("../types").CompleteProps<F> & Props)>) => {
+export declare const WithFalcor: (model: Model, graphChange$: Observable<void>, options?: Options) => <Props, F extends Record<string, unknown> = Record<string, unknown>>(paths: Error | PathSet[] | ((props: Props) => PathSet[] | Error | null) | null) => (wrappedComponent: import("react").ComponentType<(import("../types").ErrorProps & Props) | (import("../types").NextProps<F> & Props) | (import("../types").CompleteProps<F> & Props)>) => {
     new (props: Readonly<Props>): {
         state: {
             mappedProps: (import("../types").ErrorProps & Props) | (import("../types").NextProps<F> & Props) | (import("../types").CompleteProps<F> & Props) | undefined;

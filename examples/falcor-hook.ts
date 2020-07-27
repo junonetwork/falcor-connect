@@ -41,7 +41,7 @@ export const TodoList: SFC<Props> = (props) => {
   )
   const { handler: createTodo } = useFalcorCall(() => ['todos', 'create'])
 
-  const prev = useRef<{} | Partial<Fragment>>()
+  const prev = useRef<Partial<Fragment> | null>()
   console.log(props.panel, status, fragment, prev.current === fragment)
   prev.current = fragment
 
@@ -70,5 +70,5 @@ export const TodoList: SFC<Props> = (props) => {
             el('span', {}, label.value),
             el('button', { onClick: () => toggleStatus({ idx, status: status.value }) }, 'X'))
       ),
-      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], fragment))))
+      pathOr<FalcorList<Todo>>({}, ['todos'], fragment))))
 }

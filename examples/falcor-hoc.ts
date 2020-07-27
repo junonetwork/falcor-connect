@@ -12,16 +12,16 @@ type Fragment = {
 }
 
 
-const withFalcor = WithFalcor<{ page: number }, Fragment>(model, graphChange$)
+const withFalcor = WithFalcor(model, graphChange$)
 
 const PAGE_SIZE = 5
 const isFirstPage = (page: number) => page === 0
 const isLastPage = (page: number, length: number) => (page + 1) * PAGE_SIZE >= length
 
 
-export const TodoList = compose<{ page: number, setPage: (page: number) => void } & ChildProps<Fragment>, {}>(
+export const TodoList = compose<{ page: number, setPage: (page: number) => void } & ChildProps<Fragment>, Record<never, never>>(
   withState('page', 'setPage', 0),
-  withFalcor(({ page }) => [
+  withFalcor<{ page: number }, Fragment>(({ page }) => [
     ['todos', { from: page * PAGE_SIZE, to: (page * PAGE_SIZE) + PAGE_SIZE - 1 }, ['label', 'status']],
     ['todos', 'length']
   ])
@@ -41,7 +41,7 @@ export const TodoList = compose<{ page: number, setPage: (page: number) => void 
           }, label.value) :
           el('li', { key: idx }, 'Error')
       ),
-      pathOr<FalcorList<Todo>>({} as FalcorList, ['todos'], fragment))),
+      pathOr<FalcorList<Todo>>({}, ['todos'], fragment))),
     el('div', {},
       length === 0 ? null : el('p', {}, `${(page * PAGE_SIZE) + 1} to ${Math.min((page * PAGE_SIZE) + PAGE_SIZE, length)} of ${length}`),
       el('button', { onClick: prevPage, disabled: isFirstPage(page) }, 'previous'),

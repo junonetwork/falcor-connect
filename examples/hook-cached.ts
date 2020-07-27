@@ -5,10 +5,9 @@ import { of, iif, throwError, Observable } from 'rxjs'
 import { range } from 'ramda'
 
 
-const switchScan = <T, R>(
-  accumulator: (acc: R, value: T, index: number) => Observable<R>,
-  seed: R
-) => (source$: Observable<T>) => {
+const switchScan = <T, R>(accumulator: (acc: R, value: T, index: number) => Observable<R>, seed: R) => (
+  source$: Observable<T>
+) => {
   let acc = seed
   return source$.pipe(
     switchMap((value, index) => accumulator(acc, value, index)),
@@ -26,7 +25,10 @@ const project = (stream$: Observable<string>) => stream$.pipe(
           throwError('500'),
           of(data),
         )),
-        map((data) => [{ ...cache, [channel]: { data, status: 'complete' } }, channel]),
+        map<number[], [{ [channel: string]: { data: number[], status: string } }, string]>((data) => [
+          { ...cache, [channel]: { data, status: 'complete' } },
+          channel
+        ]),
         startWith<[{ [channel: string]: { data: number[], status: string } }, string]>([
           { ...cache, [channel]: { data: [], status: 'pending' } },
           channel
@@ -43,7 +45,7 @@ const project = (stream$: Observable<string>) => stream$.pipe(
   map(([cache, channel]) => cache[channel!])
 )
 
-export const CachedWidget: SFC<{}> = () => {
+export const CachedWidget: SFC = () => {
   const [channel, setChannel] = useState('friend-list')
   const selectChannel = useCallback(({ target: { value } }) => setChannel(value), [])
   const next = useStream(project, channel)
@@ -54,12 +56,12 @@ export const CachedWidget: SFC<{}> = () => {
   return el('div', null,
     el('div', null,
       el('select', { value: channel, onChange: selectChannel },
-       el('option', { value: 'friend-list' }, 'Friends'),
-       el('option', { value: 'enemy-list' }, 'Enemies'),
-       el('option', { value: 'grocery-list' }, 'Groceries'))),
+        el('option', { value: 'friend-list' }, 'Friends'),
+        el('option', { value: 'enemy-list' }, 'Enemies'),
+        el('option', { value: 'grocery-list' }, 'Groceries'))),
     el('h1', null, channel),
     status === 'pending' && el('div', null, 'loading...'),
-    status === 'error' && el('div', null, `Error`),
+    status === 'error' && el('div', null, 'Error'),
     el('ul', null, ...data.map((item, idx) => (
       el('li', { key: idx }, item))))
   )

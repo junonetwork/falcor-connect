@@ -1,68 +1,68 @@
 import { Observable, of, from, Subscribable, ReplaySubject } from 'rxjs'
 import { PathSet, Model, JSONEnvelope } from 'falcor'
 import { equals as deepEquals } from 'ramda'
-import { Fragment, ErrorProps, ChildProps } from './types'
+import { Fragment, ErrorProps, ChildProps, NextProps, CompleteProps } from './types'
 import { catchError, repeatWhen, map, refCount, multicast, scan, distinctUntilChanged, bufferCount, startWith, switchAll, tap, finalize } from 'rxjs/operators'
 import { startWithSynchronous } from './rxjs/startWithSynchronous'
 import { endWithSynchronous } from './rxjs/endWithSynchronous'
 
 
 export type Options = {
-  errorHandler?: (error: Error, caught?: Observable<unknown>) => Observable<ChildProps>
+  errorHandler?: (error: unknown, caught?: Observable<unknown>) => Observable<ErrorProps>
   equals?: (prev: PathSet[], next: PathSet[]) => boolean
+  progressive?: boolean
 }
 
 
-export const defaultErrorHandler = (error: Error) => {
+export const defaultErrorHandler = (error: unknown) => {
   console.error(error)
   return of<ErrorProps>({
-    fragment: {}, status: 'error' as const, error: error instanceof Error ? error : new Error(error)
+    fragment: null,
+    status: 'error',
+    error: error instanceof Error ? error : typeof error === 'string' ? new Error(error) : new Error()
   })
 }
 
 
 export const connect = (
   model: Model,
-  graphChange$: Observable<undefined>,
-  { errorHandler = defaultErrorHandler, equals = deepEquals }: Options = {}
+  graphChange$: Observable<void>,
+  { errorHandler = defaultErrorHandler, equals = deepEquals, progressive = true }: Options = {}
 ) => <T extends Fragment = Fragment>(pathSets$: Observable<PathSet[] | Error | null>): Observable<ChildProps<T>> => {
-  const defaultNextProps: ChildProps<T> = { fragment: {}, status: 'next' as const }
-  const defaultCompleteProps: ChildProps<T> = { fragment: {}, status: 'complete' as const }
+  const defaultNextProps: NextProps<T> = { fragment: {}, status: 'next' }
+  const defaultCompleteProps: CompleteProps<T> = { fragment: {}, status: 'complete' }
   const subject = new ReplaySubject<ChildProps<T>>(1)
   let complete = false
-  let _result: ChildProps<T> = defaultCompleteProps
+  let prevChildProps: ChildProps<T> | undefined
 
   return pathSets$.pipe(
     startWith([]),
     bufferCount(2, 1),
     scan((query$, [prevPaths, paths]) => {
       if (paths instanceof Error) {
-        return of<ChildProps<T>>({ fragment: {}, status: 'error' as const, error: paths })
+        return of<ErrorProps>({ fragment: null, status: 'error', error: paths })
       } else if (paths === null) {
-        return of<ChildProps<T>>(defaultNextProps)
+        return of<NextProps<T>>(defaultNextProps)
       } else if (paths.length === 0) {
-        return of<ChildProps<T>>(defaultCompleteProps)
-      } else if (prevPaths !== null && !(prevPaths instanceof Error) && complete && equals(prevPaths, paths)) {
-        /**
-         * TODO
-         * what if pathSet$ emits twice quickly with identical values before the model emits?
-         * rather than waiting for model, will unsubscribe from model and return stale _result
-         * need to invalidate _result
-         */
-        subject.next(_result)
+        return of<CompleteProps<T>>(defaultCompleteProps)
+      } else if (complete && prevChildProps && Array.isArray(prevPaths) && equals(prevPaths, paths)) {
+        subject.next(prevChildProps)
         return query$
       }
 
       complete = false
-      return from(model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Partial<T>>>).pipe(
-        map<JSONEnvelope<Partial<T>>, ChildProps<T>>(({ json }) => ({ fragment: json, status: 'next' as const })),
-        startWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'next' as const })),
-        endWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' as const })),
+      return from(progressive ?
+        model.get(...paths).progressively() as unknown as Subscribable<JSONEnvelope<Partial<T>>> :
+        model.get(...paths) as unknown as Subscribable<JSONEnvelope<Partial<T>>>
+      ).pipe(
+        map<JSONEnvelope<Partial<T>>, NextProps<T>>(({ json }) => ({ fragment: json, status: 'next' })),
+        startWithSynchronous(defaultNextProps),
+        endWithSynchronous<NextProps<T> | CompleteProps<T>>((envelope) => envelope === undefined ? defaultCompleteProps : { fragment: envelope.fragment, status: 'complete' }),
         catchError<ChildProps<T>, Observable<ChildProps<T>>>(errorHandler),
         repeatWhen<ChildProps<T>>(() => graphChange$),
         multicast(subject),
         refCount(), // TODO - replace with shareReplay or publishReplay?: https://itnext.io/the-magic-of-rxjs-sharing-operators-and-their-differences-3a03d699d255
-        tap((result) => _result = result),
+        tap((_prevChildProps) => prevChildProps = _prevChildProps),
         finalize(() => complete = true)
       )
     }, of<ChildProps<T>>({ fragment: {}, status: 'complete' as const })),
@@ -78,11 +78,11 @@ export const connect = (
  */
 // export const connect2 = (
 //   model: Model,
-//   graphChange$: Observable<undefined>,
+//   graphChange$: Observable<void>,
 //   { errorHandler = defaultErrorHandler, equals = deepEquals }: Options = {}
 // ) => <F extends Fragment = Fragment>(pathSets$: Observable<PathSet[] | Error | null>): Observable<ChildProps<T>> => {
 //   let complete = false
-//   let _result: ChildProps<T> = { fragment: {}, status: 'complete' }
+//   let prevChildProps: ChildProps<T> = { fragment: {}, status: 'complete' }
 
 //   return pathSets$.pipe(
 //     startWith([]),
@@ -95,7 +95,7 @@ export const connect = (
 //       } else if (paths.length === 0) {
 //         return of<ChildProps<T>>({ fragment: {}, status: 'complete' })
 //       } else if (prevPaths !== null && !(prevPaths instanceof Error) && complete && equals(prevPaths, paths)) {
-//         of(_result)
+//         of(prevChildProps)
 //       }
 
 //       complete = false
@@ -105,7 +105,7 @@ export const connect = (
 //         endWithSynchronous((envelope) => ({ fragment: envelope === undefined ? {} : envelope.fragment, status: 'complete' })),
 //         catchError(errorHandler),
 //         repeatWhen(() => graphChange$),
-//         tap((result) => _result = result),
+//         tap((result) => prevChildProps = result),
 //         finalize(() => complete = true)
 //       )
 //     })
@@ -117,7 +117,7 @@ export const connect = (
  */
 // export const connect = (
 //   model: Model,
-//   graphChange$: Observable<undefined>,
+//   graphChange$: Observable<void>,
 //   { errorHandler = defaultErrorHandler }: Options = {}
 // ) => {
 //   const graphChangeHandler = () => graphChange$
