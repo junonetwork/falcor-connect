@@ -13,7 +13,7 @@ export declare type CompleteProps<T extends Fragment = Fragment> = {
 };
 export declare type ErrorProps = {
     status: 'error';
-    fragment: null;
+    fragment?: undefined;
     error: Error;
 };
 export declare type ChildProps<T extends Fragment = Fragment> = NextProps<T> | CompleteProps<T> | ErrorProps;

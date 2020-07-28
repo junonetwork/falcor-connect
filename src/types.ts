@@ -5,7 +5,7 @@ export type Fragment = Record<string, unknown>
 
 export type NextProps<T extends Fragment = Fragment> = { status: 'next', fragment: Partial<T>, error?: undefined }
 export type CompleteProps<T extends Fragment = Fragment> = { status: 'complete', fragment: Partial<T>, error?: undefined }
-export type ErrorProps = { status: 'error', fragment: null, error: Error }
+export type ErrorProps = { status: 'error', fragment?: undefined, error: Error }
 
 export type ChildProps<T extends Fragment = Fragment> = NextProps<T> | CompleteProps<T> | ErrorProps
 

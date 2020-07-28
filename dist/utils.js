@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.map = exports.isAtom = exports.isEmpty = exports.isErrorSentinel = exports.isPathSets = void 0;
+exports.path = exports.map = exports.isAtom = exports.isEmpty = exports.isErrorSentinel = exports.isPathSets = void 0;
 var ramda_1 = require("ramda");
 exports.isPathSets = function (paths) {
     if (!Array.isArray(paths)) {
@@ -17,13 +17,14 @@ exports.isPathSets = function (paths) {
     return true;
 };
 exports.isErrorSentinel = function (fragment) {
-    return ramda_1.propEq('$type', 'error', fragment);
+    return fragment !== undefined && fragment !== null && fragment.$type === 'error';
 };
 exports.isEmpty = function (fragment) {
     return fragment === undefined || fragment.value === null;
 };
 exports.isAtom = function (atom, value) {
-    if (atom === undefined || atom.$type !== 'atom') {
+    var _a;
+    if (((_a = atom) === null || _a === void 0 ? void 0 : _a.$type) !== 'atom') {
         return false;
     }
     else if (value === undefined) {
@@ -40,6 +41,27 @@ exports.map = function (project, falcorList) {
         if (key !== 'length' && key !== '$__path' && !exports.isErrorSentinel(falcorList[key]) && !exports.isEmpty(falcorList[key])) {
             result.push(project(falcorList[key], parseInt(key, 10)));
         }
+    }
+    return result;
+};
+exports.path = function (value) {
+    var path = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        path[_i - 1] = arguments[_i];
+    }
+    if (value === undefined) {
+        return undefined;
+    }
+    var result = value;
+    for (var i = 0; i < path.length; i++) {
+        var next = result[path[i]];
+        if (next === undefined || next === null) {
+            return undefined;
+        }
+        else if (exports.isErrorSentinel(next)) {
+            return next;
+        }
+        result = next;
     }
     return result;
 };

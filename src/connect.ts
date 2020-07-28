@@ -17,7 +17,6 @@ export type Options = {
 export const defaultErrorHandler = (error: unknown) => {
   console.error(error)
   return of<ErrorProps>({
-    fragment: null,
     status: 'error',
     error: error instanceof Error ? error : typeof error === 'string' ? new Error(error) : new Error()
   })
@@ -40,7 +39,7 @@ export const connect = (
     bufferCount(2, 1),
     scan((query$, [prevPaths, paths]) => {
       if (paths instanceof Error) {
-        return of<ErrorProps>({ fragment: null, status: 'error', error: paths })
+        return of<ErrorProps>({ status: 'error', error: paths })
       } else if (paths === null) {
         return of<NextProps<T>>(defaultNextProps)
       } else if (paths.length === 0) {

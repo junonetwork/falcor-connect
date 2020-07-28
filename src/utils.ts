@@ -1,5 +1,6 @@
 import { PathSet } from 'falcor'
-import { equals, propEq } from 'ramda'
+import { equals } from 'ramda'
+import { O } from 'ts-toolbelt'
 import { ErrorSentinel, Atom, FalcorList, Sentinel } from './types'
 
 
@@ -23,7 +24,7 @@ export const isPathSets = (paths: unknown): paths is PathSet[] => {
 
 
 export const isErrorSentinel = (fragment: unknown): fragment is ErrorSentinel => {
-  return propEq('$type', 'error', fragment as Record<string, unknown>)
+  return fragment !== undefined && fragment !== null && (fragment as Sentinel).$type === 'error'
 }
 
 export const isEmpty = (fragment: unknown) => {
@@ -31,7 +32,7 @@ export const isEmpty = (fragment: unknown) => {
 }
 
 export const isAtom = <T = unknown>(atom: unknown, value?: T): atom is Atom<T> => {
-  if (atom === undefined || (atom as Sentinel).$type !== 'atom') {
+  if ((atom as Sentinel)?.$type !== 'atom') {
     return false
   } else if (value === undefined) {
     return true
@@ -54,4 +55,28 @@ export const map = <T, R>(project: (item: T, index: number) => R, falcorList: Fa
   }
 
   return result
+}
+
+export const path = <T extends Record<string, unknown>, P extends (string | number)[]>(value: T | undefined, ...path: P): O.Path<T, P, 0> | ErrorSentinel | undefined => {
+  if (value === undefined) {
+    return undefined
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let result: any = value
+
+  for (let i = 0; i < path.length; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const next = result[path[i]]
+    if (next === undefined || next === null) {
+      return undefined
+    } else if (isErrorSentinel(next)) {
+      return next
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    result = next
+  }
+
+  return result as O.Path<T, P, 0>
 }

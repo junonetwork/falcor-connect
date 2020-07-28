@@ -9,7 +9,6 @@ var endWithSynchronous_1 = require("./rxjs/endWithSynchronous");
 exports.defaultErrorHandler = function (error) {
     console.error(error);
     return rxjs_1.of({
-        fragment: null,
         status: 'error',
         error: error instanceof Error ? error : typeof error === 'string' ? new Error(error) : new Error()
     });
@@ -25,7 +24,7 @@ exports.connect = function (model, graphChange$, _a) {
         return pathSets$.pipe(operators_1.startWith([]), operators_1.bufferCount(2, 1), operators_1.scan(function (query$, _a) {
             var prevPaths = _a[0], paths = _a[1];
             if (paths instanceof Error) {
-                return rxjs_1.of({ fragment: null, status: 'error', error: paths });
+                return rxjs_1.of({ status: 'error', error: paths });
             }
             else if (paths === null) {
                 return rxjs_1.of(defaultNextProps);
