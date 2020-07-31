@@ -16,6 +16,7 @@ var withFalcor_1 = require("./hoc/withFalcor");
 Object.defineProperty(exports, "WithFalcor", { enumerable: true, get: function () { return withFalcor_1.WithFalcor; } });
 var utils_1 = require("./utils");
 Object.defineProperty(exports, "isPathSets", { enumerable: true, get: function () { return utils_1.isPathSets; } });
-Object.defineProperty(exports, "isErrorSentinel", { enumerable: true, get: function () { return utils_1.isErrorSentinel; } });
 Object.defineProperty(exports, "isAtom", { enumerable: true, get: function () { return utils_1.isAtom; } });
+Object.defineProperty(exports, "isErrorSentinel", { enumerable: true, get: function () { return utils_1.isErrorSentinel; } });
 Object.defineProperty(exports, "map", { enumerable: true, get: function () { return utils_1.map; } });
+Object.defineProperty(exports, "path", { enumerable: true, get: function () { return utils_1.path; } });
