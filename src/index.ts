@@ -7,9 +7,10 @@ export { mapPropsStream } from './mapPropsStream'
 export { WithFalcor } from './hoc/withFalcor'
 export {
   isPathSets,
-  isErrorSentinel,
   isAtom,
-  map
+  isErrorSentinel,
+  map,
+  path,
 } from './utils'
 export {
   NextProps,
@@ -19,6 +20,7 @@ export {
   Atom,
   ErrorSentinel,
   Ref,
+  Sentinel,
   Primitive,
   ComplexType,
   FalcorList,
