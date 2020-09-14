@@ -9,18 +9,17 @@ exports.useStream = function (project, data) {
     var rerendering = react_1.useRef(false);
     var stream$ = react_1.useRef(new rxjs_1.Subject());
     var _a = react_1.useState(false), _ = _a[0], rerender = _a[1];
-    react_1.useLayoutEffect(function () {
-        var subscription = stream$.current.pipe(project).subscribe({
-            next: function (next) {
-                result.current = next;
-                if (!synchronous.current) {
-                    rerendering.current = true;
-                    rerender(function (x) { return !x; });
-                }
+    var subscription = react_1.useRef(stream$.current.pipe(project).subscribe({
+        next: function (next) {
+            result.current = next;
+            if (!synchronous.current) {
+                rerendering.current = true;
+                rerender(function (x) { return !x; });
             }
-        });
-        stream$.current.next(data);
-        return function () { return subscription.unsubscribe(); };
+        }
+    }));
+    react_1.useEffect(function () {
+        return function () { return subscription.current.unsubscribe(); };
     }, []);
     if (!rerendering.current) {
         synchronous.current = true;

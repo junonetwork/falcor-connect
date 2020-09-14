@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Observable, Subject } from 'rxjs'
 
 
@@ -38,19 +38,18 @@ export const useStream = <T, R>(
   const stream$ = useRef(new Subject<T>())
   const [_, rerender] = useState(false)
 
-  useLayoutEffect(() => {
-    const subscription = stream$.current.pipe(project).subscribe({
-      next: (next) => {
-        result.current = next
-        if (!synchronous.current) {
-          rerendering.current = true
-          rerender((x) => !x)
-        }
+  const subscription = useRef(stream$.current.pipe(project).subscribe({
+    next: (next) => {
+      result.current = next
+      if (!synchronous.current) {
+        rerendering.current = true
+        rerender((x) => !x)
       }
-    })
+    }
+  }))
 
-    stream$.current.next(data)
-    return () => subscription.unsubscribe()
+  useEffect(() => {
+    return () => subscription.current.unsubscribe()
   }, [])
 
   if (!rerendering.current) {
