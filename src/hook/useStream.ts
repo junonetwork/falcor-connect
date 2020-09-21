@@ -49,8 +49,9 @@ export const useStream = <T, R>(
   }))
 
   useEffect(() => {
-    return () => subscription.current.unsubscribe()
-  }, [])
+    const _subscription = subscription.current
+    return () => _subscription.unsubscribe()
+  })
 
   if (!rerendering.current) {
     synchronous.current = true

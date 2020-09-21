@@ -19,8 +19,9 @@ exports.useStream = function (project, data) {
         }
     }));
     react_1.useEffect(function () {
-        return function () { return subscription.current.unsubscribe(); };
-    }, []);
+        var _subscription = subscription.current;
+        return function () { return _subscription.unsubscribe(); };
+    });
     if (!rerendering.current) {
         synchronous.current = true;
         result.current = undefined;
