@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { Observable, Subject } from 'rxjs'
+import { Observable, Subject, Subscription } from 'rxjs'
 
 
 /**
@@ -36,22 +36,26 @@ export const useStream = <T, R>(
   const synchronous = useRef(true)
   const rerendering = useRef(false)
   const stream$ = useRef(new Subject<T>())
+  const subscription = useRef<Subscription | null>(null)
   const [_, rerender] = useState(false)
 
-  const subscription = useRef(stream$.current.pipe(project).subscribe({
-    next: (next) => {
-      result.current = next
-      if (!synchronous.current) {
-        rerendering.current = true
-        rerender((x) => !x)
+  if (subscription.current === null) {
+    subscription.current = stream$.current.pipe(project).subscribe({
+      next: (next) => {
+        result.current = next
+        if (!synchronous.current) {
+          rerendering.current = true
+          rerender((x) => !x)
+        }
       }
-    }
-  }))
+    })
+  }
 
-  useEffect(() => {
-    const _subscription = subscription.current
-    return () => _subscription.unsubscribe()
-  })
+  useEffect(() => () => {
+    if (subscription.current !== null) {
+      subscription.current.unsubscribe()
+    }
+  }, [])
 
   if (!rerendering.current) {
     synchronous.current = true
@@ -63,3 +67,43 @@ export const useStream = <T, R>(
 
   return result.current
 }
+
+
+/**
+ * why doens't updating state in a useEffect hook compose?
+ */
+// export const useStream = <T, R>(
+//   project: (stream$: Observable<T>) => Observable<R>,
+//   data: T,
+// ): R | undefined => {
+//   const result = useRef<R>()
+//   const synchronous = useRef(true)
+//   const rerendering = useRef(false)
+//   const stream$ = useRef(new Subject<T>())
+//   const [_, rerender] = useState(false)
+
+//   useEffect(() => {
+//     const subscription = stream$.current.pipe(project).subscribe({
+//       next: (next) => {
+//         result.current = next
+//         if (!synchronous.current) {
+//           rerendering.current = true
+//           rerender((x) => !x)
+//         }
+//       }
+//     })
+
+//     stream$.current.next(data)
+//     return () => subscription.unsubscribe()
+//   }, [])
+
+//   if (!rerendering.current) {
+//     synchronous.current = true
+//     result.current = undefined
+//     stream$.current.next(data)
+//     synchronous.current = false
+//   }
+//   rerendering.current = false
+
+//   return result.current
+// }

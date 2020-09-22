@@ -8,20 +8,24 @@ exports.useStream = function (project, data) {
     var synchronous = react_1.useRef(true);
     var rerendering = react_1.useRef(false);
     var stream$ = react_1.useRef(new rxjs_1.Subject());
+    var subscription = react_1.useRef(null);
     var _a = react_1.useState(false), _ = _a[0], rerender = _a[1];
-    var subscription = react_1.useRef(stream$.current.pipe(project).subscribe({
-        next: function (next) {
-            result.current = next;
-            if (!synchronous.current) {
-                rerendering.current = true;
-                rerender(function (x) { return !x; });
+    if (subscription.current === null) {
+        subscription.current = stream$.current.pipe(project).subscribe({
+            next: function (next) {
+                result.current = next;
+                if (!synchronous.current) {
+                    rerendering.current = true;
+                    rerender(function (x) { return !x; });
+                }
             }
+        });
+    }
+    react_1.useEffect(function () { return function () {
+        if (subscription.current !== null) {
+            subscription.current.unsubscribe();
         }
-    }));
-    react_1.useEffect(function () {
-        var _subscription = subscription.current;
-        return function () { return _subscription.unsubscribe(); };
-    });
+    }; }, []);
     if (!rerendering.current) {
         synchronous.current = true;
         result.current = undefined;
