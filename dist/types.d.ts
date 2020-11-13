@@ -25,8 +25,9 @@ export declare type Ref = {
     $type: 'ref';
     value: Path;
 };
-export declare type ErrorSentinel = {
+export declare type ErrorSentinel<T = unknown> = {
     $type: 'error';
+    value: T;
 };
 export declare type Sentinel = Atom | Ref | ErrorSentinel;
 export declare type Primitive = string | number | boolean | null | undefined;
