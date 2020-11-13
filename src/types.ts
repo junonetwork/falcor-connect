@@ -11,7 +11,7 @@ export type ChildProps<T extends Fragment = Fragment> = NextProps<T> | CompleteP
 
 export type Atom<T = unknown> = { $type: 'atom', value: T }
 export type Ref = { $type: 'ref', value: Path }
-export type ErrorSentinel = { $type: 'error' }
+export type ErrorSentinel<T = unknown> = { $type: 'error', value: T }
 export type Sentinel = Atom | Ref | ErrorSentinel
 
 export type Primitive = string | number | boolean | null | undefined
