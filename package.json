@@ -32,7 +32,7 @@
     "@typescript-eslint/parser": "^3.5.0",
     "clean-webpack-plugin": "^3.0.0",
     "eslint": "^7.3.1",
-    "falcor": "^2.1.0",
+    "falcor": "github:netflix/falcor#v2.3.1",
     "falcor-router": "^0.8.3",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.10.2",
